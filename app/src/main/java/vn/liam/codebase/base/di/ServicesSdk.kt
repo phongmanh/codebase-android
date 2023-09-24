@@ -9,6 +9,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import vn.liam.codebase.BuildConfig
 import vn.liam.codebase.utils.JsonUtil
 import java.net.SocketTimeoutException
 import java.security.KeyManagementException
@@ -25,11 +26,11 @@ import javax.net.ssl.X509TrustManager
 interface IService
 object ServicesSdk {
 
-    fun <IService> apiBuilderProvide(host: String, apiClass: Class<IService>): IService {
+    fun <IService> apiBuilderProvide(host: String = getHost(), apiClass: Class<IService>): IService {
         return ServicesSdk.retrofitInstance(host).create(apiClass)
     }
 
-    private fun retrofitInstance(host: String): Retrofit {
+    private fun retrofitInstance(host: String = getHost()): Retrofit {
         val okHttpClient: OkHttpClient = headersInjectedHTTPClient
         return Retrofit.Builder().addConverterFactory(
             GsonConverterFactory.create(
@@ -40,7 +41,7 @@ object ServicesSdk {
     }
 
 
-    private fun retrofitNoLog(host: String): Retrofit {
+    private fun retrofitNoLog(host: String = getHost()): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(JsonUtil.instance.gson))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).baseUrl(host).build()
@@ -53,9 +54,9 @@ object ServicesSdk {
         get() {
             var builder: OkHttpClient.Builder = OkHttpClient.Builder()
             builder = injectRequestHeadersBuilder(builder)
-//            if (BuildConfig.DEBUG) {
-//                builder = injectLoggingBuilder(builder)
-//            }
+            if (BuildConfig.DEBUG) {
+                builder = injectLoggingBuilder(builder)
+            }
             builder = injectUnsafeBuilder(builder)
             builder.interceptors().add(Interceptor { chain -> onOnIntercept(chain) })
             return builder.build()
@@ -73,8 +74,10 @@ object ServicesSdk {
     }
 
     private fun Request.addAuthQuery(): Request {
-        return this.newBuilder().url(
-            this.url.newBuilder().addQueryParameter("api_key", "a2c5deb5fdb2ebb10ce53c1fe6b06eca")
+        return this.newBuilder()//.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzNzQxMTg0NmNjZjVlNTIwMDIzNzViZTdmYzVmYTdhNSIsInN1YiI6IjY1MGVmZTNkZTFmYWVkMDEwMGU4NTI2ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y98uLBlf96JMcdxSRUZnf997gwsZbv0JIoP5_cHLIt4")
+            .url(
+            this.url.newBuilder()
+                .addQueryParameter("api_key", getApiKey())
                 .build()
         ).build()
     }
@@ -139,4 +142,8 @@ object ServicesSdk {
         builder.sslSocketFactory(sslSocketFactory, unsafeTrustManager)
         return builder
     }
+
+    private fun getApiKey(): String = BuildConfig.API_KEY
+    private fun getHost(): String = BuildConfig.MOVIE_HOST
+
 }
