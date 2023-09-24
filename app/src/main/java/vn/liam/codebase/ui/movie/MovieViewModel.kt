@@ -9,10 +9,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import vn.liam.codebase.base.models.MovieModel
+import vn.liam.codebase.base.networking.Resource
 import vn.liam.codebase.base.repositories.MovieRepository
 import javax.inject.Inject
 
@@ -37,4 +36,5 @@ class MovieViewModel @Inject constructor(
     fun setSearchQuery(query: String?) {
         searchQuery.value = query
     }
+
 }

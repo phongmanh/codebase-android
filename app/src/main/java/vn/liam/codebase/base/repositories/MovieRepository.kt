@@ -31,4 +31,13 @@ class MovieRepository @Inject constructor(private val movieServices: MovieServic
             Resource.Error(errorMessage = "Wrong")
         }
     }
+
+    suspend fun getMovieById(movieId: Int): Resource<MovieModel> {
+        return try {
+            val res = movieServices.getMovieById(movieId)
+            Resource.Success(res)
+        } catch (e: Exception) {
+            Resource.Error(errorMessage = "Wrong")
+        }
+    }
 }

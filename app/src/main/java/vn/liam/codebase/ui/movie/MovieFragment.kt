@@ -3,9 +3,8 @@ package vn.liam.codebase.ui.movie
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import android.widget.Toast
-import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.activityViewModels
+import android.widget.SearchView
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,14 +20,13 @@ import vn.liam.codebase.R
 import vn.liam.codebase.base.adapters.SimpleRecyclerPagingAdapter
 import vn.liam.codebase.base.adapters.SimpleRecyclerPagingItem
 import vn.liam.codebase.databinding.FragmentHomeBinding
-import vn.luke.library.journey.base.contract.JRoute
 import vn.luke.library.journey.base.scope.micro.MicroFragmentBinding
 
 @AndroidEntryPoint
-class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, JRoute>(
+class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, MovieRoute>(
     R.layout.fragment_home
 ), SimpleRecyclerPagingAdapter.ItemViewClickListener {
-    private val viewModel: MovieViewModel by activityViewModels()
+    private val viewModel: MovieViewModel by viewModels()
 
     private lateinit var mAdapter: SimpleRecyclerPagingAdapter
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -113,20 +111,22 @@ class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, JRoute>(
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText.isNullOrBlank()) viewModel.setSearchQuery(null)
                 return false
             }
 
         })
 
-        mBinding.searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.let {
-            it.setOnClickListener {
-                //Clear query
-                mBinding.searchView.setQuery("", false);
-                //Collapse the action view
-                mBinding.searchView.onActionViewCollapsed();
-                viewModel.setSearchQuery(null)
-            }
-        }
+       // mBinding.searchView.suggestionsAdapter
+//        mBinding.searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.let {
+//            it.setOnClickListener {
+//                //Clear query
+//                mBinding.searchView.setQuery("", false);
+//                //Collapse the action view
+//                mBinding.searchView.onActionViewCollapsed();
+//                viewModel.setSearchQuery(null)
+//            }
+//        }
     }
 
     private fun headerTitle(isSearch: Boolean) {
@@ -140,11 +140,7 @@ class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, JRoute>(
     override fun onItemViewClick(itemView: SimpleRecyclerPagingItem) {
         // Movie Details
         val item = itemView as MovieItem
-        Toast.makeText(
-            requireContext(),
-            "Movie selected: ${item.movieModel.movieId}.",
-            Toast.LENGTH_LONG
-        ).show()
+        route?.onMovieSelected(item.movieModel)
     }
 
 }

@@ -16,6 +16,7 @@
         <import type="android.view.View" />
     </data>
 
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -41,14 +42,15 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:title="@{title}" />
 
-            <androidx.appcompat.widget.SearchView
+            <SearchView
                 android:id="@+id/searchView"
-                app:queryHint="@string/search_hint"
-                app:searchHintIcon="@null"
-                android:background="@color/disabled_color"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/mainToolbar"/>
+                android:layout_below="@id/mainToolbar"
+                android:background="@color/disabled_color"
+                app:queryHint="@string/search_hint"
+                app:searchHintIcon="@null" />
+
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/swipe_refresh_layout"

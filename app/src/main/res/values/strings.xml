@@ -6,4 +6,11 @@
     <string name="trending_title">Trending Movies</string>
     <string name="search_result_title">Search Results</string>
     <string name="search_hint">Enter your movie</string>
+    <string name="error_message">There is an issue, please try again later.</string>
+    <string name="tile_message">Oops!</string>
+    <string name="movie_cast_crew_title"><![CDATA[Casts & Crews]]></string>
+    <string name="movie_see_all_title">See All</string>
+    <string name="directors_label"><![CDATA[Directors: Drector1 & Drector2]]></string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -1,6 +1,7 @@
 package vn.liam.codebase.base.services
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 import vn.liam.codebase.base.di.IService
 import vn.liam.codebase.base.models.MovieModel
@@ -22,6 +23,6 @@ interface MovieServices : IService {
     ): MovieRes
 
     @GET("/3/movie/{movie_id}")
-    suspend fun getMovieById(@Query("movie_id") movie_id: Int): MovieModel
+    suspend fun getMovieById(@Path("movie_id") movie_id: Int): MovieModel
 
 }
