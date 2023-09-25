@@ -2,17 +2,18 @@ package vn.liam.codebase.ui.movie
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -35,6 +36,37 @@ class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, MovieRoute>(
 
     }
 
+
+    private var previousJob: Job? = null
+    private fun makeAdapter() {
+        previousJob?.cancel()
+        previousJob = viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.getMovies().onEach { pagingData ->
+//                    val item: PagingData<SimpleRecyclerPagingItem> =
+//                        pagingData.map { movie ->
+//                            movie.imagePosterUrl =
+//                                "https://image.tmdb.org/t/p/original" + "${movie.poster_path}"
+//                            MovieItem(
+//                                mAdapter,
+//                                movie,
+//                                this@MovieFragment
+//                            )
+//                        }
+                    mAdapter.submitData(pagingData.map { movie ->
+                        movie.imagePosterUrl =
+                            "https://image.tmdb.org/t/p/original" + "${movie.poster_path}"
+                        MovieItem(
+                            mAdapter,
+                            movie,
+                            this@MovieFragment
+                        )
+                    })
+                }.collect()
+            }
+        }
+    }
+
     private fun setupView() {
         mBinding.lifecycleOwner = viewLifecycleOwner
         headerTitle(false)
@@ -43,45 +75,34 @@ class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, MovieRoute>(
             itemAnimator = null
             layoutManager = LinearLayoutManager(requireContext())
             adapter = mAdapter
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    viewModel.trendingMovie.onEach { pagingData ->
-                        val item: PagingData<SimpleRecyclerPagingItem> = pagingData.map { movie ->
-                            movie.imagePosterUrl =
-                                "https://image.tmdb.org/t/p/original" + "${movie.poster_path}"
-                            MovieItem(
-                                mAdapter,
-                                movie,
-                                this@MovieFragment
-                            )
-                        }
-                        mAdapter.submitData(item)
-                    }.collect()
-                }
-            }
+            makeAdapter()
         }
-
         //  -------------------------------------
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 mAdapter.loadStateFlow.onEach {
-                    run {
-                        if (it.append is LoadState.Loading) {
-                            mBinding.progressLinear.visibility = View.VISIBLE
-                        } else if (it.refresh is LoadState.Loading) {
-                            mBinding.progressLinear.visibility = View.GONE
-                            mBinding.progressCircular.visibility = View.VISIBLE
-                        } else {
-                            mBinding.progressLinear.visibility = View.GONE
-                            mBinding.progressCircular.visibility = View.GONE
-                            if (it.refresh is LoadState.Error || it.append is LoadState.Error) {
-                                //Error handing
+                    it.decideOnState(
+                        showLoading = { loading ->
+                            if (loading) {
+                                mBinding.progressLinear.visibility = View.VISIBLE
+                                mBinding.showError = false
                             } else {
-                                // Something went wrong
+                                mBinding.progressLinear.visibility = View.GONE
                             }
+                        },
+                        showEmptyState = { isEmpty ->
+                            if (isEmpty) {
+                                mBinding.showError = true
+                            } else {
+                                mBinding.progressLinear.visibility = View.GONE
+                                mBinding.progressCircular.visibility = View.GONE
+                                mBinding.showError = false
+                            }
+                        },
+                        showErrorMessage = { error ->
+                            Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
                         }
-                        mBinding.executePendingBindings()
-                    }
+                    )
                 }.collect()
             }
         }
@@ -90,15 +111,15 @@ class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, MovieRoute>(
         mBinding.swipeRefreshLayout.apply {
             setOnRefreshListener {
                 isRefreshing = false
-                mAdapter.refresh()
+                mAdapter.retry()
+                makeAdapter()
             }
         }
 
         viewModel.searchQuery.observe(viewLifecycleOwner) {
             headerTitle(!it.isNullOrBlank())
-            mAdapter.refresh()
+            makeAdapter()
         }
-
         searchViewHanding()
 
     }
@@ -116,17 +137,6 @@ class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, MovieRoute>(
             }
 
         })
-
-       // mBinding.searchView.suggestionsAdapter
-//        mBinding.searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.let {
-//            it.setOnClickListener {
-//                //Clear query
-//                mBinding.searchView.setQuery("", false);
-//                //Collapse the action view
-//                mBinding.searchView.onActionViewCollapsed();
-//                viewModel.setSearchQuery(null)
-//            }
-//        }
     }
 
     private fun headerTitle(isSearch: Boolean) {
@@ -141,6 +151,33 @@ class MovieFragment : MicroFragmentBinding<FragmentHomeBinding, MovieRoute>(
         // Movie Details
         val item = itemView as MovieItem
         route?.onMovieSelected(item.movieModel)
+    }
+
+    private inline fun CombinedLoadStates.decideOnState(
+        showLoading: (Boolean) -> Unit,
+        showEmptyState: (Boolean) -> Unit,
+        showErrorMessage: (String) -> Unit
+    ) {
+        showLoading(refresh is LoadState.Loading)
+
+        showEmptyState(
+            source.append is LoadState.NotLoading
+                    && source.append.endOfPaginationReached
+                    && mAdapter.itemCount == 0
+        )
+
+        val errorState = source.append as? LoadState.Error
+            ?: source.prepend as? LoadState.Error
+            ?: source.refresh as? LoadState.Error
+            ?: append as? LoadState.Error
+            ?: prepend as? LoadState.Error
+            ?: refresh as? LoadState.Error
+
+        errorState?.let {
+            if (mAdapter.itemCount == 0) {
+                showErrorMessage(it.error.message ?: "UnknownError")
+            }
+        }
     }
 
 }

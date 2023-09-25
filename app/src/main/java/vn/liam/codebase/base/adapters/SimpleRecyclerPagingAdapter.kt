@@ -8,12 +8,16 @@ import androidx.recyclerview.widget.DiffUtil
 open class SimpleRecyclerPagingAdapter() :
     BindableRecyclerPagingAdapter(ITEM_COMPARATOR) {
 
+    override fun getItemCount(): Int {
+        return snapshot().items.count()
+    }
+
     override fun getViewItem(position: Int): Any {
-        return getItem(position)!!
+        return snapshot().items[position]
     }
 
     override fun getLayout(position: Int): Int {
-        return getItem(position)!!.getLayout()
+        return snapshot().items[position].getLayout()
     }
 
     override fun getViewHolder(binding: ViewDataBinding, viewType: Int): BindableViewHolder? {

@@ -12,7 +12,7 @@ interface MovieServices : IService {
     // time_window: day or week
     @GET("/3/trending/movie/day")
     suspend fun trendingMovies(
-        @Query("page") page: Int,
+        @Query("page") page: Int?,
         @Query("pageSize") pageSize: Int
     ): MovieRes
 

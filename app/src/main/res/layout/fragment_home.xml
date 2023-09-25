@@ -47,8 +47,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/mainToolbar"
-                android:background="@color/disabled_color"
+                android:background="@drawable/bg_rounded"
+                android:queryBackground="@android:color/transparent"
+                android:layout_margin="@dimen/_4sdp"
                 app:queryHint="@string/search_hint"
+                android:visibility="@{(!showError? View.VISIBLE : View.GONE)}"
                 app:searchHintIcon="@null" />
 
 
@@ -66,6 +69,11 @@
                     android:visibility="@{(!showError? View.VISIBLE : View.GONE)}" />
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <include
+                android:id="@+id/error_container"
+                layout="@layout/error_screen_layout"
+                android:visibility="@{(showError? View.VISIBLE : View.GONE)}" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/progress_linear"

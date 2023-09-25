@@ -7,6 +7,7 @@ import androidx.lifecycle.liveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import vn.liam.codebase.base.database.dao.MovieDAO
 import vn.liam.codebase.base.models.MovieModel
 import vn.liam.codebase.base.networking.Resource
 import vn.liam.codebase.base.repositories.MovieRepository
@@ -20,6 +21,7 @@ class DetailsViewModel @Inject constructor(
 ) : ViewModel() {
 
     var movieId: Int? = savedStateHandle[MovieSdk.PARAMS.MOVIE_ID_KEY]
+
 
     fun getMovieById(movieId: Int) = liveData {
         emit(Resource.Loading())

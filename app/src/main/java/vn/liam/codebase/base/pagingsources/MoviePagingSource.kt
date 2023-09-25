@@ -1,10 +1,11 @@
-package vn.liam.codebase.ui.movie
+package vn.liam.codebase.base.pagingsources
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import retrofit2.HttpException
 import vn.liam.codebase.base.models.MovieModel
 import vn.liam.codebase.base.repositories.MovieRepository
+import vn.liam.codebase.ui.movie.MovieSdk
 import java.io.IOException
 
 class MoviePagingSource(private val movieServices: MovieRepository, private val query: String?) :

@@ -2,11 +2,16 @@ package vn.liam.codebase.base.models
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.bumptech.glide.Glide
 import com.google.gson.annotations.SerializedName
 import vn.liam.codebase.R
 
+@Entity(tableName = "movies")
 data class MovieModel(
+    @PrimaryKey(autoGenerate = false)
     @SerializedName("id")
     val movieId: Int?,
     @SerializedName("poster_path")
@@ -39,21 +44,21 @@ data class MovieModel(
     val vote_average: Float?,
     //Details
     @SerializedName("genres")
-    val genres: List<Genres>,
+    val genres: List<Genres>?,
     @SerializedName("production_companies")
-    val production_companies: List<ProductionCompany>,
+    val production_companies: List<ProductionCompany>?,
     @SerializedName("production_countries")
-    val production_countries: List<ProductionCountry>,
+    val production_countries: List<ProductionCountry>?,
     @SerializedName("spoken_languages")
-    val spoken_languages: List<SpokenLanguage>,
+    val spoken_languages: List<SpokenLanguage>?,
     @SerializedName("homepage")
     val homepage: String?,
     @SerializedName("revenue")
-    val revenue: Int,
+    val revenue: Int?,
     @SerializedName("runtime")
     val runtime: Int?,
     @SerializedName("status")
-    val status: MovieStatus, //Allowed Values: Rumored, Planned, In Production, Post Production, Released, Canceled
+    val status: MovieStatus?, //Allowed Values: Rumored, Planned, In Production, Post Production, Released, Canceled
     @SerializedName("tagline")
     val tagline: String?
 ) {
