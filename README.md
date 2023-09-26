@@ -1,5 +1,8 @@
 # codebase-android
 
+Using Micro front-end to development the project.
+
+
 ✅ Add a search field to the top of the screen.
 
 ✅ If the search field is empty, please use this endpoint: https://developer.themoviedb.org/reference/trending-movies to get the trending movies for today and create an infinite list (query the next page as it scrolls).
