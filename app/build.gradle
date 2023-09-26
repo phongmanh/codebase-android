@@ -27,7 +27,7 @@ android {
 
         debug {
             minifyEnabled false
-            buildConfigField("String", "MOVIE_HOST","\"https://api.themoviedb.org/\"")
+            buildConfigField("String", "MOVIE_HOST", "\"https://api.themoviedb.org/\"")
             buildConfigField("String", "API_KEY", "\"47aa75b56464da7a186b813a50035cd4\"")
         }
 
@@ -53,11 +53,27 @@ android {
         correctErrorTypes true
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            // Enable JUnit 5 (Gradle 4.6+).
+            useJUnitPlatform()
+            // Always run tests, even when nothing changed.
+            dependsOn 'cleanTest'
+
+            // Show test results.
+            testLogging {
+                events "passed", "skipped", "failed"
+            }
+        }
+    }
+
 }
 
 dependencies {
 
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.test:core-ktx:1.5.0'
     def appcompat_version = "1.6.1"
     def retrofit_version = "2.9.0"
     def hilt_version = "2.44"
@@ -65,7 +81,10 @@ dependencies {
     def nav_version = '2.7.2'
     def lifecycle_version = "2.6.2"
     def paging_version = "3.2.1"
-
+    def mockitoVersion = "5.5.0"
+    def mockitoKotlinVersion = "3.2.0"
+    def mockkVersion = "1.13.8"
+    def test_coroutines_version = "1.7.3"
 
     implementation project(':journey-base')
 
@@ -78,7 +97,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-
     // Room
 
     implementation "androidx.room:room-runtime:$room_version"
@@ -114,6 +132,21 @@ dependencies {
 
     //========== Testing
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'androidx.test:core:1.5.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.8.2'
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$test_coroutines_version"
+    testImplementation "androidx.arch.core:core-testing:2.2.0"
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    // Optional -- Mockito framework
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    // Optional -- mockito-kotlin
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    // Optional -- Mockk framework
+    testImplementation "io.mockk:mockk:$mockkVersion"
 }
