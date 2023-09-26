@@ -19,4 +19,9 @@ abstract class MainNavigator : JourneyActivity<MainRoute>(
     override fun onDetailsGoBack() {
         popScreen()
     }
+
+    override fun onBackPressed() {
+        shouldFinishMainActivityOnBackPressedCallback = true
+        super.onBackPressed()
+    }
 }

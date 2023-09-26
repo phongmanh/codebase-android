@@ -1,0 +1,62 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'vn.luke.library.journey.base'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 24
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        dataBinding true
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:+'
+    implementation 'androidx.core:core-ktx:+'
+    def nav_version = "2.5.3"
+    def core_ktx_version = "1.9.0"
+    def app_compat_version = "1.6.1"
+    def material_version = "1.8.0"
+    def transition_version = "1.4.1"
+    def fragment_version = "1.5.5"
+    def lifecycle_version = "2.5.1"
+    def activity_version = "1.6.1"
+
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation "androidx.core:core-ktx:$core_ktx_version"
+    implementation "androidx.appcompat:appcompat:$app_compat_version"
+    implementation "com.google.android.material:material:$material_version"
+    implementation "androidx.transition:transition:$transition_version"
+    implementation "androidx.fragment:fragment:$fragment_version"
+    implementation "androidx.fragment:fragment-ktx:$fragment_version"
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
+    implementation "androidx.activity:activity:$activity_version"
+    implementation "androidx.activity:activity-ktx:$activity_version"
+}

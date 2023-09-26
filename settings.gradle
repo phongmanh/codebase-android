@@ -14,5 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "codebase"
 include ':app'
+//include ':journey-base'
+//project (':journey-base').projectDir = new File('../library/journey-android/journey-base')
 include ':journey-base'
-project (':journey-base').projectDir = new File('../library/journey-android/journey-base')
